@@ -40,11 +40,13 @@ const getLatLong = (city: Cities): { lat: number; lon: number } => {
 };
 
 const getWeatherForecast = async (
-  city: Cities
+  city: Cities,
+  imperial: boolean
 ): Promise<{ current: WeatherData; forecast: ForecastData[] }> => {
   const { lat, lon } = getLatLong(city);
+  const units = imperial ? "imperial" : "metric";
   const response = await fetch(
-    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=minutely,hourly&appid=${process.env.REACT_APP_API_KEY}`
+    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=${units}&exclude=minutely,hourly&appid=${process.env.REACT_APP_API_KEY}`
   );
 
   const data: OpenWeatherApiResponse = await response.json();
@@ -78,10 +80,11 @@ const getWeatherForecast = async (
 
 interface WeatherProps {
   city: Cities;
+  imperial: boolean;
 }
 
 const Weather: any = (props: WeatherProps) => {
-  const { city } = props;
+  const { city, imperial } = props;
   const [weatherData, setWeatherData] = useState<WeatherData | undefined>(
     undefined
   );
@@ -89,18 +92,18 @@ const Weather: any = (props: WeatherProps) => {
   const [forecastData, setForecastData] = useState<ForecastData[]>([]);
 
   useEffect(() => {
-    getWeatherForecast(city).then((res) => {
+    getWeatherForecast(city, imperial).then((res) => {
       setWeatherData(res.current);
       setForecastData(res.forecast);
     });
-  }, [city]);
+  }, [city, imperial]);
 
   return (
     <>
       {weatherData && forecastData && (
         <div className="WeatherContainer">
-          <WeatherDataSection weatherData={weatherData} />
-          <ForecastList forecastData={forecastData} />
+          <WeatherDataSection imperial={imperial} weatherData={weatherData} />
+          <ForecastList imperial={imperial} forecastData={forecastData} />
         </div>
       )}
     </>
