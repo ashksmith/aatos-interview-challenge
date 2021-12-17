@@ -9,8 +9,8 @@ const Thunder = (props: ThunderProps) => {
   const { height = "100px", width = "100px" } = props;
   return (
     <svg
-      width="100px"
-      height="100px"
+      width={height}
+      height={width}
       viewBox="0 0 25.942 21.155"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
