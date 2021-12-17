@@ -6,10 +6,6 @@ import ForecastCard from "components/ForecastCard/ForecastCard";
 import { ForecastData } from "interfaces";
 import { weekdays } from "project_constants";
 
-interface ForecastListProps {
-  forecastData: ForecastData[];
-}
-
 const getDayFromTodaysDate = (days: number): string => {
   const todaysDate = new Date();
   const currentDate = new Date();
@@ -18,13 +14,19 @@ const getDayFromTodaysDate = (days: number): string => {
   return weekdays[currentDate.getDay()];
 };
 
+interface ForecastListProps {
+  forecastData: ForecastData[];
+  imperial: boolean;
+}
+
 const ForecastList = (props: ForecastListProps): ReactElement => {
-  const { forecastData } = props;
+  const { forecastData, imperial } = props;
 
   return (
     <div className="ForecastListContainer">
       {forecastData.map((f, index) => (
         <ForecastCard
+          imperial={imperial}
           key={index}
           title={getDayFromTodaysDate(index)}
           min={f.tempMin}

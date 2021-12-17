@@ -9,11 +9,13 @@ const { Title } = Typography;
 
 interface WeatherDataSectionProps {
   weatherData: WeatherData;
+  imperial: boolean;
 }
 
 const WeatherDataSection: FunctionComponent<WeatherDataSectionProps> = (
   props
 ) => {
+  const { imperial, weatherData } = props;
   const {
     apiWeatherCode,
     description,
@@ -24,7 +26,10 @@ const WeatherDataSection: FunctionComponent<WeatherDataSectionProps> = (
     tempMax,
     tempMin,
     temp,
-  } = props.weatherData;
+  } = weatherData;
+
+  const tempUnit = imperial ? "°F" : "°C";
+  const speedUnit = imperial ? "mph" : "m/s";
 
   return (
     <>
@@ -35,7 +40,7 @@ const WeatherDataSection: FunctionComponent<WeatherDataSectionProps> = (
           </Col>
           <Col span={12}>
             <Title level={1} style={{ margin: 0 }}>
-              {temp} °C
+              {temp} {tempUnit}
             </Title>
             {description}
           </Col>
@@ -56,15 +61,15 @@ const WeatherDataSection: FunctionComponent<WeatherDataSectionProps> = (
             Humidity: {humidity}%
           </Col>
           <Col xs={24} sm={12} span={12}>
-            Windspeed: {windspeed} m/s
+            Windspeed: {windspeed} {speedUnit}
           </Col>
         </Row>
         <Row justify="center" align="middle">
           <Col xs={24} sm={12} span={12}>
-            Max degrees: {tempMax} °C
+            Max degrees: {tempMax} {tempUnit}
           </Col>
           <Col xs={24} sm={12} span={12}>
-            Min degrees: {tempMin} °C
+            Min degrees: {tempMin} {tempUnit}
           </Col>
         </Row>
       </div>
