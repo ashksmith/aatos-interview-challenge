@@ -1,3 +1,4 @@
+import "./ForecastCard.scss";
 import { memo, ReactElement } from "react";
 import { Card } from "antd";
 
@@ -16,15 +17,21 @@ const ForecastCard = (props: ForecastCardProps): ReactElement => {
   const tempUnit = imperial ? "°F" : "°C";
 
   return (
-    <Card size="small" title={title} hoverable>
-      <WeatherIcon height="75px" width="75px" apiWeatherCode={apiWeatherCode} />
-      <p>
-        Min: {min} {tempUnit}
-      </p>
-      <p>
-        Max: {max} {tempUnit}
-      </p>
-    </Card>
+    <div className="Card">
+      <Card size="small" title={title} hoverable>
+        <WeatherIcon
+          height="75px"
+          width="75px"
+          apiWeatherCode={apiWeatherCode}
+        />
+        <p>
+          Min: {min} {tempUnit}
+        </p>
+        <p>
+          Max: {max} {tempUnit}
+        </p>
+      </Card>
+    </div>
   );
 };
 

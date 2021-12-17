@@ -1,0 +1,19 @@
+.Card {
+  animation: slideIn 1s ease-in-out forwards;
+  opacity: 0;
+}
+
+@for $i from 1 through 7 {
+  .Card:nth-child(#{$i}n) {
+    animation-delay: #{$i * 0.1}s;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
