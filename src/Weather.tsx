@@ -1,80 +1,109 @@
 import "./Weather.css";
-import React from "react";
-import { Typography } from "antd";
+import { useState, useEffect } from "react";
 
-interface WeatherData {
-  icon: string;
-  main: string;
-  description: string;
-}
+import WeatherDataSection from "components/WeatherDataSection/WeatherDataSection";
+import ForecastList from "components/ForecastList/ForecastList";
 
-interface WeatherDataSectionProps {
-  weatherData: WeatherData;
-}
-const WeatherDataSection: React.FunctionComponent<WeatherDataSectionProps> = (
-  props
-) => {
-  const { weatherData } = props;
-  const iconUrl = `http://openweathermap.org/img/wn/${weatherData.icon}@2x.png`;
+import {
+  WeatherData,
+  Cities,
+  OpenWeatherApiResponse,
+  ForecastData,
+} from "interfaces";
 
-  return (
-    <div>
-      <img src={iconUrl} className="Weather-logo" alt="logo" />
-      <Typography.Title level={2}>{weatherData.main}</Typography.Title>
-      <Typography.Text>{weatherData.description}</Typography.Text>
-    </div>
-  );
+const convertTimestampTo24Hours = (timestamp: number): string => {
+  const date = new Date(timestamp * 1000);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const hoursNeedsZero = hours < 12 ? true : false;
+  const minutesNeedsZero = minutes < 10 ? true : false;
+
+  return `${hoursNeedsZero ? "0" : ""}${hours}:${minutes}${
+    minutesNeedsZero ? "0" : ""
+  }`;
 };
 
-type DayEntry = any;
-const getTemperatureForDay = (day: DayEntry) => {
-  return day.temp.day;
+const getLatLong = (city: Cities): { lat: number; lon: number } => {
+  switch (city) {
+    case "Helsinki":
+      return { lat: 60.19, lon: 24.94 };
+    case "Tampere":
+      return { lat: 61.5, lon: 23.79 };
+    case "Turku":
+      return { lat: 60.45, lon: 22.27 };
+    case "Oulu":
+      return { lat: 65.01, lon: 25.47 };
+    default:
+      throw new Error("Unknown city");
+  }
 };
 
-const getWeatherForecast = async (city: string): Promise<DayEntry[]> => {
-  const getLatLong = () => {
-    switch (city) {
-      case "Helsinki":
-        return { lat: 60.19, lon: 24.94 };
-      case "Tampere":
-        return { lat: 61.5, lon: 23.79 };
-      case "Turku":
-        return { lat: 60.45, lon: 22.27 };
-      case "Oulu":
-        return { lat: 65.01, lon: 25.47 };
-      default:
-        throw new Error("Unknown city");
-    }
-  };
-  const { lat, lon } = getLatLong();
+const getWeatherForecast = async (
+  city: Cities
+): Promise<{ current: WeatherData; forecast: ForecastData[] }> => {
+  const { lat, lon } = getLatLong(city);
   const response = await fetch(
     `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=minutely,hourly&appid=${process.env.REACT_APP_API_KEY}`
   );
-  const data = await response.json();
-  const dailyForecast = data.daily;
-  console.log(dailyForecast);
-  return dailyForecast;
+
+  const data: OpenWeatherApiResponse = await response.json();
+  const { sunrise, sunset, humidity, wind_speed, temp } = data.current;
+
+  // Remove current day from forecast
+  data.daily.shift();
+  const forecastData: ForecastData[] = data.daily.map((f) => {
+    return {
+      apiWeatherCode: f.weather[0].id,
+      tempMin: f.temp.min.toFixed(1),
+      tempMax: f.temp.max.toFixed(1),
+    };
+  });
+
+  return {
+    current: {
+      apiWeatherCode: data.current.weather[0].id,
+      description: data.current.weather[0].description,
+      sunrise: convertTimestampTo24Hours(sunrise),
+      sunset: convertTimestampTo24Hours(sunset),
+      humidity: humidity,
+      windspeed: wind_speed.toFixed(1),
+      temp: temp.toFixed(1),
+      tempMax: data.daily[0].temp.max.toFixed(1),
+      tempMin: data.daily[0].temp.min.toFixed(1),
+    },
+    forecast: forecastData,
+  };
 };
 
-const getWeatherFromApi = async (): Promise<WeatherData> => {
-  const response = await fetch(
-    `http://api.openweathermap.org/data/2.5/weather?q=Helsinki&appid=${process.env.REACT_APP_API_KEY}`
+interface WeatherProps {
+  city: Cities;
+}
+
+const Weather: any = (props: WeatherProps) => {
+  const { city } = props;
+  const [weatherData, setWeatherData] = useState<WeatherData | undefined>(
+    undefined
   );
-  const data = await response.json();
-  const weather = data.weather[0];
-  return weather;
-};
 
-const Weather: React.FunctionComponent = () => {
-  const [weatherData] = React.useState<WeatherData | undefined>(undefined);
+  const [forecastData, setForecastData] = useState<ForecastData[]>([]);
 
+  useEffect(() => {
+    getWeatherForecast(city).then((res) => {
+      setWeatherData(res.current);
+      setForecastData(res.forecast);
+    });
+  }, [city]);
 
-  if (!weatherData) {
-    return <p>No data</p>;
-  }
   return (
-    <Typography.Title>Current Weather</Typography.Title>
-    <WeatherDataSection weatherData={weatherData} />
+    <>
+      {weatherData && forecastData && (
+        <div className="WeatherContainer">
+          <WeatherDataSection weatherData={weatherData} />
+          <ForecastList forecastData={forecastData} />
+        </div>
+      )}
+    </>
   );
 };
 

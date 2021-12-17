@@ -1,0 +1,13 @@
+.CityName,
+.CountryName {
+  margin: 0 !important;
+}
+
+.CityNameContainer {
+  display: flex;
+}
+
+.MenuOverlay {
+  background-color: white !important;
+  color: inherit !important;
+}

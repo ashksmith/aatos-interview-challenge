@@ -1,0 +1,41 @@
+@import "~antd/dist/antd.css";
+
+$dark0: #2e3440;
+$dark1: #3b4252;
+$dark2: #434c5e;
+
+$light0: #d8dee9;
+$light1: #e5e9f0;
+$light2: #eceff4;
+
+.App {
+  padding: 15px !important;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  transition: 0.5s;
+}
+
+* {
+  background-color: inherit !important;
+  color: inherit !important;
+  stroke: inherit !important;
+  fill: inherit !important;
+}
+
+.Light {
+  background-color: $light0 !important;
+  color: $dark0 !important;
+  fill: $light2 !important;
+  stroke: $dark2 !important;
+}
+
+.Dark {
+  background-color: $dark0 !important;
+  color: $light0 !important;
+  fill: $dark2 !important;
+  stroke: $light2 !important;
+}
