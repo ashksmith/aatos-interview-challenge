@@ -24,7 +24,7 @@ export enum ApiWeatherCodes {
   RAIN = 5,
   SNOW = 6,
   ATMOSPHERE = 7,
-  CLEAR = 800, // Bastards
+  CLEAR = 800,
   CLOUDY = 8,
 }
 
